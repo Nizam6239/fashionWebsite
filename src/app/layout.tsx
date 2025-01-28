@@ -1,7 +1,14 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
+import Navbar from "./components/Navbar";
+import Footer from "./components/Footer";
+import AuthProvider from "./context/AuthProviders";
+import { CartProvider } from "./context/CardContext";
+import { Toaster } from "react-hot-toast";
+import ChatBot from "./components/ChatBot";
 
+// Load custom fonts
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
   variable: "--font-geist-sans",
@@ -24,11 +31,19 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" className="dark">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {children}
+        <AuthProvider>
+          <CartProvider>
+            <Navbar />
+            <Toaster /> {/* Add Toaster here */}
+            <main>{children}</main>
+            <ChatBot />
+            <Footer />
+          </CartProvider>
+        </AuthProvider>
       </body>
     </html>
   );
