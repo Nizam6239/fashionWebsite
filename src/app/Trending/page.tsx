@@ -65,8 +65,6 @@ const Page = () => {
           if (!response.ok) {
             throw new Error("Failed to add item to the cart");
           }
-  
-          const addedItem = await response.json();
           addToCart({ ...item, quantity });
           toast.success("Successfully Added to Cart");
         } catch (err) {

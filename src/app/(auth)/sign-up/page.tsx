@@ -79,7 +79,7 @@ function Login() {
     } catch (error) {
       console.error("Error in signup user", error);
       const axiosError = error as AxiosError<ApiResponse>;
-      let errorMessage = axiosError.response?.data.message;
+      const errorMessage = axiosError.response?.data.message;
       toast({
         title: "Signup Fail",
         description: errorMessage,
@@ -138,12 +138,14 @@ function Login() {
                 <FormItem>
                   <FormLabel>Username</FormLabel>
                   <FormControl>
-                    <Input placeholder="username" {...field} 
-                      onChange={(e) => {
-                        field.onChange(e),
-                        setUsername(e.target.value)
-                      }}
-                    />
+                  <Input 
+                    placeholder="username" 
+                    {...field} 
+                    onChange={(e) => {
+                      field.onChange(e);
+                      setUsername(e.target.value);
+                    }} 
+                  />
                   </FormControl>
                   {isCheckingUsername && (<Loader2 className="animate-spin" />)}
                   <p className={`text-sm ${usernameMessage === "username is unique" ? "text-green-500" : "text-red-500"}`}>

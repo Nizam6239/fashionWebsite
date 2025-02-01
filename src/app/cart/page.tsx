@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { useCart } from "../context/CardContext";
 import { useSession } from "next-auth/react";
+import Image from "next/image";
 
 const Cart = () => {
   const { data: session } = useSession();
@@ -43,8 +44,12 @@ const Cart = () => {
       }
 
       updateQuantity(id, newQuantity);
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err:unknown) {
+      if (err instanceof Error) {
+        setError(err.message); // Error object
+      } else {
+        setError("An unknown error occurred"); // Handle unexpected cases
+      }
     } finally {
       setLoading(false);
     }
@@ -69,8 +74,12 @@ const Cart = () => {
       }
 
       removeFromCart(id);
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message); // Error object
+      } else {
+        setError("An unknown error occurred"); // Handle unexpected cases
+      }
     } finally {
       setLoading(false);
     }
@@ -93,11 +102,15 @@ const Cart = () => {
                 className="flex items-center justify-between p-4 border border-gray-300 rounded-lg"
               >
                 <div className="flex items-center space-x-4">
-                  <img
-                    src={item.img?.src || "/placeholder.png"}
-                    alt={`Image ${item.id}`}
-                    className="w-24 h-24 rounded object-fill"
-                  />
+                <Image
+                  src={item.img?.src || "/placeholder.png"}
+                  alt={`Image ${item.id}`}
+                  width={0}
+                  height={0}
+                  sizes="100vw"
+                  style={{ width: "100%", height: "auto" }}
+                />
+
                   <div>
                     <span className="block mt-2">Quantity: {item.quantity}</span>
                   </div>

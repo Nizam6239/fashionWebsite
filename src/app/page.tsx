@@ -1,5 +1,4 @@
 import { CardFile } from "./components/CardFile";
-import Footer from "./components/Footer";
 import HeroSection from "./components/HeroSection";
 import MovingCard from "./components/MovingCard";
 import MovingImage from "./components/MovingImage";

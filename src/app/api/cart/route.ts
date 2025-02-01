@@ -1,14 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import CartModel from '../../models/Cart.models';
 import dbConnect from '@/app/lib/dbConnect';
-import { p } from 'framer-motion/client';
 
 export async function POST(req: NextRequest) {
   await dbConnect();
   const { userId, productId, quantity } = await req.json();
 
   try {
-    let cart = await CartModel.findOne({ userId, productId });
+    const cart = await CartModel.findOne({ userId, productId });
     if (cart) {
       cart.quantity = quantity;
       await cart.save();

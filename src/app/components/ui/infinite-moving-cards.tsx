@@ -1,7 +1,7 @@
 "use client";
 
 import { cn } from "@/app/lib/utils";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import Image from "next/image";
 
 export const InfiniteMovingCards = ({
@@ -15,7 +15,7 @@ export const InfiniteMovingCards = ({
     quote: string;
     name: string;
     title: string;
-    image?:string;
+    image?: string;
   }[];
   direction?: "left" | "right";
   speed?: "fast" | "normal" | "slow";
@@ -25,11 +25,32 @@ export const InfiniteMovingCards = ({
   const containerRef = React.useRef<HTMLDivElement>(null);
   const scrollerRef = React.useRef<HTMLUListElement>(null);
 
-  useEffect(() => {
-    addAnimation();
-  }, []);
   const [start, setStart] = useState(false);
-  function addAnimation() {
+
+  const getDirection = useCallback(() => {
+    if (containerRef.current) {
+      if (direction === "left") {
+        containerRef.current.style.setProperty("--animation-direction", "forwards");
+      } else {
+        containerRef.current.style.setProperty("--animation-direction", "reverse");
+      }
+    }
+  }, [direction]);
+
+  const getSpeed = useCallback(() => {
+    if (containerRef.current) {
+      if (speed === "fast") {
+        containerRef.current.style.setProperty("--animation-duration", "20s");
+      } else if (speed === "normal") {
+        containerRef.current.style.setProperty("--animation-duration", "40s");
+      } else {
+        containerRef.current.style.setProperty("--animation-duration", "80s");
+      }
+    }
+  }, [speed]);
+
+  // Memoize the addAnimation function to prevent unnecessary re-renders
+  const addAnimation = useCallback(() => {
     if (containerRef.current && scrollerRef.current) {
       const scrollerContent = Array.from(scrollerRef.current.children);
 
@@ -44,57 +65,38 @@ export const InfiniteMovingCards = ({
       getSpeed();
       setStart(true);
     }
-  }
-  const getDirection = () => {
-    if (containerRef.current) {
-      if (direction === "left") {
-        containerRef.current.style.setProperty(
-          "--animation-direction",
-          "forwards"
-        );
-      } else {
-        containerRef.current.style.setProperty(
-          "--animation-direction",
-          "reverse"
-        );
-      }
-    }
-  };
-  const getSpeed = () => {
-    if (containerRef.current) {
-      if (speed === "fast") {
-        containerRef.current.style.setProperty("--animation-duration", "20s");
-      } else if (speed === "normal") {
-        containerRef.current.style.setProperty("--animation-duration", "40s");
-      } else {
-        containerRef.current.style.setProperty("--animation-duration", "80s");
-      }
-    }
-  };
+  }, [getDirection, getSpeed]); // include getDirection and getSpeed
+
+  // Define getDirection and getSpeed inside the component to prevent stale closures
+  
+
+  useEffect(() => {
+    addAnimation();
+  }, [addAnimation]); // add addAnimation as a dependency
+
   return (
     <div
       ref={containerRef}
       className={cn(
-        "scroller relative z-20  max-w-7xl overflow-hidden  [mask-image:linear-gradient(to_right,transparent,white_20%,white_80%,transparent)]",
+        "scroller relative z-20 max-w-7xl overflow-hidden [mask-image:linear-gradient(to_right,transparent,white_20%,white_80%,transparent)]",
         className
       )}
     >
       <ul
         ref={scrollerRef}
         className={cn(
-          " flex min-w-full shrink-0 gap-4 py-4 w-max flex-nowrap",
-          start && "animate-scroll ",
+          "flex min-w-full shrink-0 gap-4 py-4 w-max flex-nowrap",
+          start && "animate-scroll",
           pauseOnHover && "hover:[animation-play-state:paused]"
         )}
       >
-        {items.map((item, idx) => (
+        {items.map((item) => (
           <li
+            key={item.name}
             className="w-[350px] max-w-full relative rounded-2xl border border-b-0 flex-shrink-0 border-slate-700 px-8 py-6 md:w-[450px]"
             style={{
-              background:
-                "linear-gradient(180deg, var(--slate-800), var(--slate-900)",
+              background: "linear-gradient(180deg, var(--slate-800), var(--slate-900)",
             }}
-            key={item.name}
           >
             <blockquote className="flex flex-col items-center">
               {/* Display image if available */}

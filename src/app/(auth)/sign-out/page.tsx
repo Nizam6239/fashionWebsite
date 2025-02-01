@@ -6,6 +6,8 @@ import { useRouter } from "next/navigation";
 import { useToast } from "@/components/ui/use-toast";
 import { signOut } from "next-auth/react";
 import { useState } from "react";
+import  { AxiosError } from "axios";
+import { ApiResponse } from "@/app/types/ApiResponse";
 
 function SignOut() {
   const router = useRouter();
@@ -24,6 +26,8 @@ function SignOut() {
         router.replace("/sign-in");
       }
     } catch (error) {
+      const axiosError = error as AxiosError<ApiResponse>;
+      console.log(axiosError);
       toast({
         title: "Error Signing Out",
         description: "Something went wrong while signing out.",

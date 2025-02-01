@@ -1,7 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
 import image1 from "../../../public/xmark.png";
-import image2 from "../../../public/image.png"
 import Image from "next/image";
 
 export default function ChatBot() {

@@ -3,6 +3,7 @@ import React, {
   useEffect,
   useRef,
   useState,
+  useCallback,
   createContext,
   useContext,
 } from "react";
@@ -167,7 +168,16 @@ export const Card = ({
 }) => {
   const [open, setOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
-  const { onCardClose, currentIndex } = useContext(CarouselContext);
+  const { onCardClose} = useContext(CarouselContext);
+
+  const handleOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = useCallback(() => {
+    setOpen(false);
+    onCardClose(index);
+  }, [index, onCardClose]);
 
   useEffect(() => {
     function onKeyDown(event: KeyboardEvent) {
@@ -175,27 +185,19 @@ export const Card = ({
         handleClose();
       }
     }
-
+  
     if (open) {
       document.body.style.overflow = "hidden";
     } else {
       document.body.style.overflow = "auto";
     }
-
+  
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [open]);
-
+  }, [open, handleClose]); 
   useOutsideClick(containerRef, () => handleClose());
 
-  const handleOpen = () => {
-    setOpen(true);
-  };
-
-  const handleClose = () => {
-    setOpen(false);
-    onCardClose(index);
-  };
+  
 
   return (
     <>

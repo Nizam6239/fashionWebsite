@@ -1,64 +1,94 @@
-import { NextAuthOptions } from "next-auth";
-import  CredentialsProvider  from "next-auth/providers/credentials";
-import bcrypt from "bcryptjs"
+import { NextAuthOptions, User, Session } from "next-auth";
+import CredentialsProvider from "next-auth/providers/credentials";
+import bcrypt from "bcryptjs";
 import dbConnect from "@/app/lib/dbConnect";
 import UserModel from "@/app/models/User.models";
+import { JWT } from "next-auth/jwt";
 
+// Define a custom interface for credentials
+interface Credentials {
+    email: string;
+    password: string;
+}
 
+// Define a custom session user type
+interface CustomSessionUser {
+    _id?: string;
+    username?: string;
+    email?: string; // Removed `null`
+}
+
+// Extend JWT to include custom properties
+interface CustomToken extends JWT {
+    _id?: string;
+    username?: string;
+}
+
+// NextAuth configuration
 export const authOptions: NextAuthOptions = {
-    providers:[
+    providers: [
         CredentialsProvider({
             id: "credentials",
             name: "Credentials",
             credentials: {
                 email: { label: "Email", type: "text" },
                 password: { label: "Password", type: "password" }
-            }, async authorize(credentials:any): Promise<any>{
-                await dbConnect()
+            },
+            async authorize(credentials?: Credentials): Promise<User | null> {
+                if (!credentials) {
+                    throw new Error("Missing credentials");
+                }
+
+                await dbConnect();
+
                 try {
                     const user = await UserModel.findOne({
                         $or: [
-                            {email: credentials.identifier},
-                            {username: credentials.identifier},
+                            { email: credentials.email },
+                            { username: credentials.email }
                         ]
-                    })
-                    if(!user){
-                        throw new Error("No user is find with this Email")
+                    });
+
+                    if (!user) {
+                        throw new Error("No user found with this Email or Username");
                     }
-                    const  ispasswordCorrect = await bcrypt.compare(credentials.password, user.password)
-                    if(ispasswordCorrect){
-                        return user
-                    } 
-                    else{
-                        throw new Error("Incorrect Password")
+
+                    const isPasswordCorrect = await bcrypt.compare(credentials.password, user.password);
+                    if (isPasswordCorrect) {
+                        return user as User; // Ensure it matches NextAuth's User type
+                    } else {
+                        throw new Error("Incorrect Password");
                     }
-                } catch (err: any) {
-                    throw new Error(err)
+                } catch (err) {
+                    if (err instanceof Error) {
+                        throw new Error(err.message);
+                    }
+                    throw new Error("An unknown error occurred");
                 }
             }
         })
     ],
-    callbacks:{
-        async jwt({ token, user }) {
-            if(user){
-                token._id = user._id?.toString();
-                token.username = user.username;
+    callbacks: {
+        async jwt({ token, user }: { token: CustomToken; user?: User }) {
+            if (user) {
+                token._id = (user as User)._id?.toString(); // Type assertion
+                token.username = (user as User).username;
             }
-            return token
+            return token;
         },
-        async session({ session, user, token }) {
-            if(token){
-                session.user._id = token._id;
-                session.user.username = token.username;
+        async session({ session, token }: { session: Session; token: JWT }) {
+            if (session.user) {
+                (session.user as CustomSessionUser)._id = token._id;
+                (session.user as CustomSessionUser).username = token.username;
             }
-            return session
-        },
+            return session;
+        }
     },
-    pages:{
-        signIn: 'sign-in'
+    pages: {
+        signIn: "/sign-in"
     },
-    session:{
+    session: {
         strategy: "jwt"
     },
     secret: process.env.NEXTAUTH_SECRET
-}
+};
