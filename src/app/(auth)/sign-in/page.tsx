@@ -109,7 +109,6 @@ function SignIn() {
 
         <div className="text-center mt-4">
           <p className="text-white">
-            Don't have an account?{" "}
             <Link href={"/sign-up"} className="text-blue-400 hover:text-blue-600">
               Signup
             </Link>
