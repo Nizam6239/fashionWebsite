@@ -31,8 +31,8 @@ export const WavyBackground = ({
     nt: number,
     i: number,
     x: number,
-    ctx: CanvasRenderingContext2D | null,
-    canvas: HTMLCanvasElement | null;
+    ctx: CanvasRenderingContext2D | null = null,
+    canvas: HTMLCanvasElement | null = null;
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
   const getSpeed = () => {
@@ -56,9 +56,11 @@ export const WavyBackground = ({
         ctx.filter = `blur(${blur}px)`;
         nt = 0;
         window.onresize = function () {
-          w = ctx.canvas.width = window.innerWidth;
-          h = ctx.canvas.height = window.innerHeight;
-          ctx.filter = `blur(${blur}px)`;
+          if (ctx) {
+            w = ctx.canvas.width = window.innerWidth;
+            h = ctx.canvas.height = window.innerHeight;
+            ctx.filter = `blur(${blur}px)`;
+          }
         };
         render();
       }
@@ -106,8 +108,7 @@ export const WavyBackground = ({
     return () => {
       cancelAnimationFrame(animationId);
     };
-  },);
-  
+  }, []);
 
   const [isSafari, setIsSafari] = useState(false);
   useEffect(() => {
