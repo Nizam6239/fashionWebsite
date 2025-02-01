@@ -55,6 +55,7 @@ const Page = () => {
   };
 
   const handleAddToCart = async (item: {id : number, img : StaticImageData}) => {
+    console.log(item);
     const quantity = quantities[item.id] || 1;
     if (isLoggedIn) {
       try {
@@ -69,7 +70,9 @@ const Page = () => {
             quantity,
           }),
         });
+        const responseData = await response.json();  // Log the response data
 
+      console.log("API Response:", responseData);
         if (!response.ok) {
           throw new Error("Failed to add item to the cart");
         }

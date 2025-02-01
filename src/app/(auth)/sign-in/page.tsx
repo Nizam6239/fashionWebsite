@@ -21,7 +21,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-function Signup() {
+function SignIn() {
   const router = useRouter();
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -36,15 +36,16 @@ function Signup() {
 
   const onSubmit = async (data: z.infer<typeof signInSchema>) => {
     setIsSubmitting(true);
+
     const result = await signIn("credentials", {
       redirect: false,
-      identifier: data.identifier,
+      identifier: data.identifier, // Supports both email & username
       password: data.password,
     });
 
     if (result?.error) {
       toast({
-        title: "Login Fail",
+        title: "Login Failed",
         description: result.error,
         variant: "destructive",
       });
@@ -59,21 +60,21 @@ function Signup() {
 
   return (
     <div className="flex justify-center items-center min-h-screen bg-gray-700">
-      <div className="w-full max-w-md p-8 space-y-8bg-white 81 rounded-lg shadow-md bg-gray-600">
+      <div className="w-full max-w-md p-8 space-y-8  rounded-lg shadow-md bg-gray-600">
         <div className="text-center">
-          <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl mb-6">
+          <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl mb-6 text-white">
             Welcome Back to Merlin Website
           </h1>
         </div>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <FormField
               control={form.control}
               name="identifier"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Email/Username</FormLabel>
+                  <FormLabel className="text-white">Email/Username</FormLabel>
                   <FormControl>
                     <Input placeholder="email/username" {...field} />
                   </FormControl>
@@ -86,7 +87,7 @@ function Signup() {
               name="password"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Password</FormLabel>
+                  <FormLabel className="text-white">Password</FormLabel>
                   <FormControl>
                     <Input type="password" placeholder="password" {...field} />
                   </FormControl>
@@ -94,7 +95,7 @@ function Signup() {
                 </FormItem>
               )}
             />
-            <Button type="submit" disabled={isSubmitting}>
+            <Button type="submit" disabled={isSubmitting} className="w-full">
               {isSubmitting ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Please wait
@@ -105,13 +106,11 @@ function Signup() {
             </Button>
           </form>
         </Form>
+
         <div className="text-center mt-4">
-          <p>
-            Create your account?{" "}
-            <Link
-              href={"/sign-up"}
-              className="text-blue-600 hover:text-blue-800"
-            >
+          <p className="text-white">
+            Don't have an account?{" "}
+            <Link href={"/sign-up"} className="text-blue-400 hover:text-blue-600">
               Signup
             </Link>
           </p>
@@ -121,5 +120,4 @@ function Signup() {
   );
 }
 
-export default Signup;
-
+export default SignIn;
