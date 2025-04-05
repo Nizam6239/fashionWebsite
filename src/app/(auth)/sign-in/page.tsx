@@ -26,7 +26,6 @@ function SignIn() {
   const router = useRouter();
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const searchParams = useSearchParams();
 
   const form = useForm<z.infer<typeof signInSchema>>({
     resolver: zodResolver(signInSchema),
@@ -54,8 +53,7 @@ function SignIn() {
     }
 
     if (result?.url) {
-      const callbackUrl = searchParams?.get("callbackUrl") || "/";
-      router.replace(callbackUrl);  
+      router.replace("/");  
     }
 
     setIsSubmitting(false);
