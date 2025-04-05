@@ -17,7 +17,8 @@ import { Loader2 } from "lucide-react";
 import { signIn } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { use, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
@@ -52,7 +53,9 @@ function SignIn() {
     }
 
     if (result?.url) {
-      router.replace("/");
+      const searchParams = useSearchParams();
+      const callbackUrl = searchParams?.get("callbackUrl") || "/";
+      router.replace(callbackUrl);  
     }
 
     setIsSubmitting(false);
