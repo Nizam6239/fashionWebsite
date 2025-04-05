@@ -17,7 +17,7 @@ import { Loader2 } from "lucide-react";
 import { signIn } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { use, useState } from "react";
+import { useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -26,6 +26,7 @@ function SignIn() {
   const router = useRouter();
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const searchParams = useSearchParams();
 
   const form = useForm<z.infer<typeof signInSchema>>({
     resolver: zodResolver(signInSchema),
@@ -53,7 +54,6 @@ function SignIn() {
     }
 
     if (result?.url) {
-      const searchParams = useSearchParams();
       const callbackUrl = searchParams?.get("callbackUrl") || "/";
       router.replace(callbackUrl);  
     }
