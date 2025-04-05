@@ -1,4 +1,3 @@
-
 "use client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -67,6 +66,7 @@ function Login() {
   }, [username]);
 
   const onSubmit = async (data: z.infer<typeof signUpSchema>) => {
+    console.log("Submitting data:", data); // Debugging line
     setIsSubmitting(true);
     try {
       const response = await axios.post<ApiResponse>("/api/sign-up", data);
@@ -74,21 +74,20 @@ function Login() {
         title: "Success",
         description: response?.data.message,
       });
-
       router.replace(`/sign-in`);
     } catch (error) {
       console.error("Error in signup user", error);
       const axiosError = error as AxiosError<ApiResponse>;
-      const errorMessage = axiosError.response?.data.message;
       toast({
         title: "Signup Fail",
-        description: errorMessage,
+        description: axiosError.response?.data.message || "Something went wrong",
         variant: "destructive",
       });
     } finally {
       setIsSubmitting(false);
     }
   };
+  
 
   return (
     <div className="flex justify-center items-center min-h-screen bg-gray-700">
